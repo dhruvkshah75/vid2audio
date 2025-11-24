@@ -1,6 +1,7 @@
 import jwt, datetime, os
 from flask import Flask, request
 from flask_mysqldb import MySQL
+from datetime import datetime, timedelta, timezone
 
 
 server = Flask(__name__)
@@ -43,8 +44,20 @@ def login():
         return "invalid credentials", 401
     
 
-def createJWT():
-    return
+def createJWT(username, secret, authz):
+    encodedJWT = jwt.encode(
+        {
+            "username": username,
+            "exp": datetime.now(timezone.utc) + timedelta(minutes=os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES")),
+            "iat": datetime.now(timezone.utc),
+            "admin": authz,
+        },
+        secret,
+        algorithm="HS256",
+    )
+
+    return encodedJWT
+    
     
 
     
